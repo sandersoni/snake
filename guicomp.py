@@ -3,15 +3,16 @@ import sys
 import pygcurse
 import pygame
 from pygame.locals import *
-from game import Game
+from gamecomp import Game
 import coloredlogs
+import time
 
 LOGGER = logging.getLogger(__name__)
 
 WINWIDTH = 20
 WINHEIGHT = 20
 
-FPS = 40
+FPS = 100
 
 
 def main():
@@ -26,10 +27,19 @@ def main():
 
     while True:
         win.fill(bgcolor='blue')
-        handle_events(game)
+        # time.sleep(0.01)
+        if game.endstate == True:
+            time.sleep(3)
+            terminate()
+        game.find_move_random()
+        # handle_events(game)
+        handle_exit(game)
+        game.check()
         game.draw(win)
         win.update()
         clock.tick(FPS)
+
+
 
 def handle_events(game):
     for event in pygame.event.get():
@@ -44,6 +54,15 @@ def handle_events(game):
             game.move_left()
         if event.type == KEYDOWN and (event.key == K_RIGHT or event.key == K_d):
             game.move_right()
+        if event.type == KEYDOWN:
+            if game.check() == 10:
+                terminate()
+
+def handle_exit(game):
+    for event in pygame.event.get():
+        LOGGER.log(5, 'event: {0}'.format(event))
+        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            terminate()
         if event.type == KEYDOWN:
             if game.check() == 10:
                 terminate()
