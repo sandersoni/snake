@@ -23,14 +23,10 @@ class Game:
 
         self.endstate = False
 
-
-
     def empty_space(self):
         return self.whole_space - self.apples - set(self.snake)
 
     def make_apple(self):
-        #self.apples.add((random.randint(0, self.width-1), random.randint(0, self.height-1)))
-    #make_apple()
         self.apples.add(random.choice(tuple(self.empty_space())))
 
     def move_up(self):
@@ -40,9 +36,6 @@ class Game:
             self.snake = [(self.snake[0][0], self.snake[0][1] - 1)] + self.snake
             self.food -= self.food
 
-
-
-
     def move_down(self):
         if self.food == 0:
             self.snake = [(self.snake[0][0], self.snake[0][1] + 1)] + self.snake[:-1]
@@ -50,16 +43,12 @@ class Game:
             self.snake = [(self.snake[0][0], self.snake[0][1] + 1)] + self.snake
             self.food -= self.food
 
-
-
     def move_left(self):
         if self.food == 0:
             self.snake = [(self.snake[0][0] - 1, self.snake[0][1])] + self.snake[:-1]
         if self.food > 0:
             self.snake = [(self.snake[0][0] - 1, self.snake[0][1])] + self.snake
             self.food -= self.food
-
-
 
     def move_right(self):
         if self.food == 0:
@@ -85,7 +74,6 @@ class Game:
             self.endstate = True
             return 0
 
-
         direction = random.choice(self.possible)
 
         if direction == "u":
@@ -97,11 +85,51 @@ class Game:
         elif direction == "r":
             self.move_right()
 
-        # print((self.snake[0][0] - 1, self.snake[0][1]))
-        # print(self.snake)
-        # print(self.possible)
+    def nearest_apple(self):
+        apple_distances = []
+        apples_list = list(self.apples)
+        for apple in apples_list:
+            apple_distances.append((apple[0] - self.snake[0][0])**2 + (apple[1] - self.snake[0][1])**2)
+        # print(apple_distances)
+        closest_index = apple_distances.index(min(apple_distances))
+        # print(apples_list[closest_index])
+        return apples_list[closest_index]
 
-    
+    def straight_distance_sq(self,start,end):
+        return (start[0] - end[0])**2 + (start[1] - end[1])**2
+
+    def nearest_apple_distance(self,start):
+        return self.straight_distance_sq(start,self.nearest_apple())
+
+    def find_move_basic(self):
+        self.possible = []
+        # self.move_left()
+        if (self.snake[0][0], self.snake[0][1] - 1) not in self.snake and 0 <= self.snake[0][1] - 1:
+            self.possible.append(("u",self.nearest_apple_distance((self.snake[0][0],self.snake[0][1] - 1))))
+        if (self.snake[0][0], self.snake[0][1] + 1) not in self.snake and self.height > self.snake[0][1] + 1:
+            self.possible.append(("d",self.nearest_apple_distance((self.snake[0][0],self.snake[0][1] + 1))))
+        if (self.snake[0][0] - 1, self.snake[0][1]) not in self.snake and 0 <= self.snake[0][0] -1:
+            self.possible.append(("l",self.nearest_apple_distance((self.snake[0][0] - 1,self.snake[0][1]))))
+        if (self.snake[0][0] + 1, self.snake[0][1]) not in self.snake and self.width > self.snake[0][0] + 1:
+            self.possible.append(("r",self.nearest_apple_distance((self.snake[0][0] + 1,self.snake[0][1]))))
+
+        if self.possible == []:
+            LOGGER.debug('no possible moves!')
+            self.endstate = True
+            return 0
+        # print(self.possible)
+        # print(min(self.possible, key = lambda item:item[1]))
+
+        direction = min(self.possible, key = lambda item:item[1])[0]
+
+        if direction == "u":
+            self.move_up()
+        elif direction == "d":
+            self.move_down()
+        elif direction == "l":
+            self.move_left()
+        elif direction == "r":
+            self.move_right()
 
 
     def is_collision(self):
@@ -132,9 +160,6 @@ class Game:
             LOGGER.info('on apple!')
             self.eat_apple()
             self.make_apple()
-            #LOGGER.info('{0}'.format(self.empty_space()))
-
-
 
     def draw(self, win):
         win.write('O', fgcolor='orange', x=self.snake[0][0], y=self.snake[0][1])

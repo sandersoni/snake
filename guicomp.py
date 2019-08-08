@@ -12,8 +12,7 @@ LOGGER = logging.getLogger(__name__)
 WINWIDTH = 20
 WINHEIGHT = 20
 
-FPS = 100
-
+FPS = 60
 
 def main():
     log_fmt = "%(asctime)s %(name)s[%(lineno)d] %(levelname)s %(message)s"
@@ -31,32 +30,33 @@ def main():
         if game.endstate == True:
             time.sleep(3)
             terminate()
-        game.find_move_random()
+        game.find_move_basic()
         # handle_events(game)
         handle_exit(game)
         game.check()
         game.draw(win)
+        # print(game.snake)
         win.update()
         clock.tick(FPS)
 
 
 
-def handle_events(game):
-    for event in pygame.event.get():
-        LOGGER.log(5, 'event: {0}'.format(event))
-        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-            terminate()
-        if event.type == KEYDOWN and (event.key == K_UP or event.key == K_w):
-            game.move_up()
-        if event.type == KEYDOWN and (event.key == K_DOWN or event.key == K_s):
-            game.move_down()
-        if event.type == KEYDOWN and (event.key == K_LEFT or event.key == K_a):
-            game.move_left()
-        if event.type == KEYDOWN and (event.key == K_RIGHT or event.key == K_d):
-            game.move_right()
-        if event.type == KEYDOWN:
-            if game.check() == 10:
-                terminate()
+# def handle_events(game):
+#     for event in pygame.event.get():
+#         LOGGER.log(5, 'event: {0}'.format(event))
+#         if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+#             terminate()
+#         if event.type == KEYDOWN and (event.key == K_UP or event.key == K_w):
+#             game.move_up()
+#         if event.type == KEYDOWN and (event.key == K_DOWN or event.key == K_s):
+#             game.move_down()
+#         if event.type == KEYDOWN and (event.key == K_LEFT or event.key == K_a):
+#             game.move_left()
+#         if event.type == KEYDOWN and (event.key == K_RIGHT or event.key == K_d):
+#             game.move_right()
+#         if event.type == KEYDOWN:
+#             if game.check() == 10:
+#                 terminate()
 
 def handle_exit(game):
     for event in pygame.event.get():
