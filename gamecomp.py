@@ -4,6 +4,19 @@ import numpy as np
 
 LOGGER = logging.getLogger(__name__)
 
+class Node():
+    """A node for a* pathfinding"""
+    def __init__(self, parent=None, position=None):
+        self.parent = parent
+        self.position = position
+
+        self.g = 0
+        self.h = 0
+        self.f = 0
+
+    def __eq__(self,other):
+        return self.position == other.position
+
 class Game:
     def __init__(self, width, height, snake_head_pos=None):
         self.width = width
@@ -17,7 +30,7 @@ class Game:
         self.whole_space = set((i, j) for i in range(self.width) for j in range(self.height))
 
         self.make_apple()
-        self.make_apple()
+        # self.make_apple()
 
         self.food = 0
 
@@ -130,6 +143,115 @@ class Game:
             self.move_left()
         elif direction == "r":
             self.move_right()
+
+    def move_to(self,target):
+        if target[0] = self.snake[0][0] + 1 and 
+
+    def maze(self):
+        self.maze_array = np.zeros((self.width,self.height))
+        for segment in self.snake:
+            self.maze_array[segment[0]][segment[1]] = 1
+        return self.maze_array
+
+    def find_move_a_star(self):
+        self.possible = []
+        # self.move_left()
+        if (self.snake[0][0], self.snake[0][1] - 1) not in self.snake and 0 <= self.snake[0][1] - 1:
+            self.possible.append("u")
+        if (self.snake[0][0], self.snake[0][1] + 1) not in self.snake and self.height > self.snake[0][1] + 1:
+            self.possible.append("d")
+        if (self.snake[0][0] - 1, self.snake[0][1]) not in self.snake and 0 <= self.snake[0][0] -1:
+            self.possible.append("l")
+        if (self.snake[0][0] + 1, self.snake[0][1]) not in self.snake and self.width > self.snake[0][0] + 1:
+            self.possible.append("r")
+
+        if self.possible == []:
+            LOGGER.debug('no possible moves!')
+            self.endstate = True
+            return 0
+
+        start_node = Node(None,self.snake[0])
+        start_node.g = start_node.h = start_node.f = 0
+        end_node = Node(None,self.nearest_apple())
+        end_node.g = end_node.g = end_node.f = 0
+
+        open_list = []
+        closed_list = []
+
+        open_list.append(start_node)
+
+        # print(self.nearest_apple())
+        # print("start")
+
+        # counter = 0
+
+        while len(open_list) > 0:
+
+            current_node = open_list[0]
+            current_index = 0
+            for index, item in enumerate(open_list):
+                if item.f < current_node.f:
+                    current_node = item
+                    current_index = index
+
+            open_list.pop(current_index)
+            closed_list.append(current_node)
+            # print("current and end nodes:")
+            # print(current_node)
+            # print(current_node.position)
+            # print(end_node)
+            # print(end_node.position)
+            if current_node == end_node:
+                path = []
+                current = current_node
+                while current is not None:
+                    path.append(current.position)
+                    current = current.parent
+
+                return path[::-1]
+
+
+            children = []
+            for new_position in [(0,-1),(0,1),(-1,0),(1,0)]:
+
+                node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
+                #Makes sure node within the grid
+                if node_position[0] > self.width - 1 or node_position[0] < 0 or node_position[1] > self.height or node_position[1] < 0:
+                    continue
+                if self.maze()[node_position[0]][node_position[1]] != 0.0:
+                    continue
+
+                new_node = Node(current_node, node_position)
+
+                children.append(new_node)
+
+            for child in children:
+
+                for closed_child in closed_list:
+                    if child == closed_child:
+                        continue
+
+                child.g = current_node.g + 1
+                child.h = ((child.position[0] - end_node.position[0])**2) +  ((child.position[1] - end_node.position[1])**2)
+                child.f = child.g + child.h
+
+                for open_node in open_list:
+                    if child == open_node and child.g > open_node.g:
+                        continue
+
+                open_list.append(child)
+            # for node in open_list:
+            #     print(node.position)
+            #     print(node.f)
+            # print("end")
+            # if counter == 4:
+            #     break
+            # counter = counter + 1
+
+
+        # print(open_list)
+
+
 
 
     def is_collision(self):

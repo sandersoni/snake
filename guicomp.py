@@ -23,6 +23,7 @@ def main():
     clock = pygame.time.Clock()
 
     game = Game(WINWIDTH,WINHEIGHT)
+    #print(game.maze())
 
     while True:
         win.fill(bgcolor='blue')
@@ -30,7 +31,7 @@ def main():
         if game.endstate == True:
             time.sleep(3)
             terminate()
-        game.find_move_basic()
+        game.find_move_a_star()
         # handle_events(game)
         handle_exit(game)
         game.check()
