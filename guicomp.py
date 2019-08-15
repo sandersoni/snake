@@ -1,37 +1,41 @@
 import logging
 import sys
-import pygcurse
-import pygame
-from pygame.locals import *
-from gamecomp import Game
-import coloredlogs
 import time
+
+import pygame
+import pygcurse
+from pygame.locals import *
+
+import coloredlogs
+from gamecomp import Game
 
 LOGGER = logging.getLogger(__name__)
 
 WINWIDTH = 20
 WINHEIGHT = 20
 
-FPS = 60
+FPS = 100
+
 
 def main():
     log_fmt = "%(asctime)s %(name)s[%(lineno)d] %(levelname)s %(message)s"
-    coloredlogs.install( level = logging.DEBUG,fmt=log_fmt)
-    win = pygcurse.PygcurseWindow(WINWIDTH, WINHEIGHT+4, fullscreen=False)
-    pygame.display.set_caption('Window Title')
+    coloredlogs.install(level=logging.DEBUG, fmt=log_fmt)
+    win = pygcurse.PygcurseWindow(WINWIDTH, WINHEIGHT + 4, fullscreen=False)
+    pygame.display.set_caption("Window Title")
     win.autoupdate = False
     clock = pygame.time.Clock()
 
-    game = Game(WINWIDTH,WINHEIGHT)
-    #print(game.maze())
+    game = Game(WINWIDTH, WINHEIGHT)
+    # print(game.maze())
 
     while True:
-        win.fill(bgcolor='blue')
+        win.fill(bgcolor="blue")
         # time.sleep(0.01)
         if game.endstate == True:
-            time.sleep(3)
+            time.sleep(300)
             terminate()
-        game.find_move_a_star()
+        game.find_move_a_star(win)
+        # game.terminate()
         # handle_events(game)
         handle_exit(game)
         game.check()
@@ -39,7 +43,6 @@ def main():
         # print(game.snake)
         win.update()
         clock.tick(FPS)
-
 
 
 # def handle_events(game):
@@ -59,9 +62,10 @@ def main():
 #             if game.check() == 10:
 #                 terminate()
 
+
 def handle_exit(game):
     for event in pygame.event.get():
-        LOGGER.log(5, 'event: {0}'.format(event))
+        LOGGER.log(5, "event: {0}".format(event))
         if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
             terminate()
         if event.type == KEYDOWN:
@@ -73,5 +77,6 @@ def terminate():
     pygame.quit()
     sys.exit()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
