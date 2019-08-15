@@ -11,10 +11,10 @@ from gamecomp import Game
 
 LOGGER = logging.getLogger(__name__)
 
-WINWIDTH = 20
-WINHEIGHT = 20
+WINWIDTH = 50
+WINHEIGHT = 50
 
-FPS = 100
+FPS = 60
 
 
 def main():
@@ -32,7 +32,7 @@ def main():
         win.fill(bgcolor="blue")
         # time.sleep(0.01)
         if game.endstate == True:
-            time.sleep(300)
+            time.sleep(1)
             terminate()
         game.find_move_a_star(win)
         # game.terminate()

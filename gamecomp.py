@@ -66,7 +66,13 @@ class Game:
         return self.whole_space - self.apples - set(self.snake)
 
     def make_apple(self):
-        self.apples.add(random.choice(tuple(self.empty_space() - self.edge_spaces)))
+        apple_area = self.empty_space() - self.edge_spaces
+        if len(apple_area) > 0 :
+            self.apples.add(random.choice(tuple(self.empty_space() - self.edge_spaces)))
+        else:
+            LOGGER.info("no space left to make apple!")
+            self.endstate = True
+
 
     def move_up(self):
         if self.food == 0:
